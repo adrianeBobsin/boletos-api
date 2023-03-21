@@ -1,0 +1,286 @@
+{
+   "openapi":"3.0.0",
+   "info":{
+      "title":"API de boletos",
+      "description":"Esta API tem como objetivo disponibilizar um CRUD de boletos bancários",
+      "contact":{
+         "email":"adrianebobsin@gmail.com"
+      },
+      "version":"1.0.0"
+   },
+   "servers":[
+      {
+         "url":"http://localhost:3000",
+         "description":"API de teste"
+      }
+   ],
+   "paths":{
+      "/rest/bankslips":{
+         "post":{
+            "summary":"Cadastro de boleto",
+            "description":"Esta rota permite que o usuário cadastre um boleto.",
+            "tags":[
+               "Bankslips"
+            ],
+            "operationId":"createBankslips",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/Bankslips"
+                     },
+                     "examples":{
+                        "Bankslips":{
+                           "value":{
+                              "due_date":"2018-01-01",
+                              "total_in_cents":"100000",
+                              "customer":"Trillian Company"
+                           }
+                        }
+                     }
+                  }
+               }
+            },
+            "responses":{
+               "422":{
+                  "description":"Invalid bankslips. The possible reasons are: A field of the provided bankslips was null or with invalid values."
+               },
+               "400":{
+                  "description":"Bankslips not provided in the request body."
+               },
+               "201":{
+                  "description":"Bankslips created.",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/BankslipsResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "get":{
+            "summary":"Listagem de todos os boletos cadastrados.",
+            "description":"Esta rota permite que sejam listados todos os boletos.",
+            "tags":[
+               "Bankslips"
+            ],
+            "operationId":"getAllBankslips",
+            "responses":{
+               "200":{
+                  "description":"Ok",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "type":"array",
+                           "items":{
+                              "$ref":"#/components/schemas/Bankslips"
+                           }
+                        }
+                     }
+                  }
+               }
+            }
+         }
+      },
+      "/rest/bankslips/{id}":{
+         "get":{
+            "tags":[
+               "Bankslips"
+            ],
+            "summary":"Pesquisar pelo id um único boleto.",
+            "operationId":"getByIdBankslips",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "schema":{
+                     "type":"string"
+                  },
+                  "description":"ID do boleto.",
+                  "required":true
+               }
+            ],
+            "description":"Esta rota permite que seja consultado um único boleto através de seu id.",
+            "security":[
+               {
+                  "bearerAuth":[
+                     
+                  ]
+               }
+            ],
+            "responses":{
+               "422":{
+                  "description":"Bankslips not found with specified id."
+               },
+               "200":{
+                  "description":"OK.",
+                  "content":{
+                     "application/json":{
+                        "schema":{
+                           "$ref":"#/components/schemas/BankslipsDetailsResponse"
+                        }
+                     }
+                  }
+               }
+            }
+         },
+         "delete":{
+            "summary":"Cancelar um único boleto.",
+            "operationId":"cancelBankslips",
+            "tags":[
+               "Bankslips"
+            ],
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "schema":{
+                     "type":"string"
+                  },
+                  "description":"ID do boleto.",
+                  "required":true
+               }
+            ],
+            "description":"Esta rota permite que seja cancelado um único boleto através de seu id.",
+            "security":[
+               {
+                  "bearerAuth":[
+                     
+                  ]
+               }
+            ],
+            "responses":{
+               "404":{
+                  "description":"Bankslips not found with specified id."
+               },
+               "204":{
+                  "description":"Bankslips canceled."
+               }
+            }
+         }
+      },
+      "/rest/bankslips/{id}/payments":{
+         "post":{
+            "summary":"Pagar um boleto",
+            "tags":[
+               "Bankslips"
+            ],
+            "operationId":"paymentBankslips",
+            "parameters":[
+               {
+                  "name":"id",
+                  "in":"path",
+                  "schema":{
+                     "type":"string"
+                  },
+                  "description":"ID do boleto.",
+                  "required":true
+               }
+            ],
+            "description":"Esta rota permite que o usuário pague um boleto.",
+            "requestBody":{
+               "content":{
+                  "application/json":{
+                     "schema":{
+                        "$ref":"#/components/schemas/BankslipsPayment"
+                     },
+                     "examples":{
+                        "Bankslips":{
+                           "value":{
+                              "payment_date":"2018-06-30"
+                           }
+                        }
+                     }
+                  }
+               }
+            },
+            "responses":{
+               "404":{
+                  "description":"Bankslips not found with the specified id."
+               },
+               "204":{
+                  "description":"No content."
+               }
+            }
+         }
+      }
+   },
+   "components":{
+      "securitySchemes":{
+         "bearerAuth":{
+            "type":"http",
+            "scheme":"bearer",
+            "bearerFormat":"JWT"
+         }
+      },
+      "schemas":{
+         "Bankslips":{
+            "type":"object",
+            "properties":{
+               "due_date":{
+                  "type":"string"
+               },
+               "total_in_cents":{
+                  "type":"string"
+               },
+               "customer":{
+                  "type":"string"
+               }
+            }
+         },
+         "BankslipsResponse":{
+            "type":"object",
+            "properties":{
+               "id":{
+                  "type":"string"
+               },
+               "due_date":{
+                  "type":"string"
+               },
+               "total_in_cents":{
+                  "type":"string"
+               },
+               "customer":{
+                  "type":"string"
+               },
+               "status":{
+                  "type":"string"
+               }
+            }
+         },
+         "BankslipsDetailsResponse":{
+            "type":"object",
+            "properties":{
+               "id":{
+                  "type":"string"
+               },
+               "due_date":{
+                  "type":"string"
+               },
+               "total_in_cents":{
+                  "type":"string"
+               },
+               "customer":{
+                  "type":"string"
+               },
+               "fine":{
+                  "type":"string"
+               },
+               "status":{
+                  "type":"string"
+               }
+            }
+         },
+         "BankslipsPayment":{
+            "type":"object",
+            "properties":{
+               "payment_date":{
+                  "type":"string"
+               }
+            }
+         }
+      }
+   }
+}
